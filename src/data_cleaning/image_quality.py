@@ -13,8 +13,8 @@ class AssessmentStrategy:
         pass
 
 class TenengradAssessment(AssessmentStrategy):
-    def __init__(self):
-        super().__init__(1000)
+    def __init__(self, threshold=1000):
+        super().__init__(threshold)
 
     def assess_image_quality(self, image):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -26,8 +26,8 @@ class TenengradAssessment(AssessmentStrategy):
         return score
 
 class LaplacianAssessment(AssessmentStrategy):
-    def __init__(self):
-        super().__init__(100)
+    def __init__(self, threshold=100):
+        super().__init__(threshold)
 
     def assess_image_quality(self, image):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

@@ -1,9 +1,9 @@
 from src.data_cleaning import template_matching
-from src.utils import file_io
+from src.utils import file
 
 path = "../samples"
-template = file_io.read_image("../samples/template.jpg")
-images = file_io.read_images(path)
+template = file.read_image("../samples/template.jpg")
+images = file.read_images(path)
 print(len(images))
 template_matching(images, template)
 

@@ -40,11 +40,10 @@ class ImageQualityAssessment:
         self.method = method
 
     def assess_images_quality(self, images : dict):
-        """ 评估图像清晰度 返回一个标记列表，1表示清晰，0表示模糊 """
+        """ 评估图像清晰度 返回不合法列表和清晰度分数 """
         scores = {}
         invalid_images = []
 
-        print(type(images))
         # Assess image quality
         # todo: 显示进度条
         for (key, image) in images.items():

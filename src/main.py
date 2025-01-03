@@ -21,7 +21,7 @@ if __name__ == '__main__':
             case 'Folder Path':
                 folder = values['-FOLDER-']
                 # todo: 把相对路径转换为绝对路径存下来
-                if folder == "" :
+                if folder == "":
                     folder = default_path
                     window['-FOLDER-'].update(folder)
                 if not os.path.exists(folder):
@@ -40,8 +40,6 @@ if __name__ == '__main__':
                 window['-TOUT-'].update(values['-FILE LIST-'][0])
                 window['-RESULT-'].update('')
                 filename = os.path.join(cleaner.folder_path, values['-FILE LIST-'][0])
-                # print(filename)
-                # show_image(filename)
                 window['-IMAGE-'].update(source=filename)
 
             case "-SHARPNESS_ASSESS-":
@@ -62,9 +60,35 @@ if __name__ == '__main__':
                     window['-RESULT-'].update(f"Sharpness Score: %.4f (分数越大越清晰)" % score)
 
             case "-BRIGHTNESS_ASSESS-":
-                pass
+                threshold = values['-BRIGHTNESS_THRESHOLD-']
+                is_all = values['-ALL-']
+
+                if is_all:
+                    invalid_images, _ = cleaner.assess_brightness_all(threshold)
+                    psg.popup_ok(f'Found {len(invalid_images)} invalid images')
+                else:
+                    try:
+                        filename = values['-FILE LIST-'][0]
+                    except IndexError:
+                        psg.popup_ok('Please select an image first')
+                        continue
+                    score = cleaner.assess_brightness_single(filename)
+                    window['-RESULT-'].update(f"Brightness Score: %.4f (分数越大越亮)" % score)
 
             case "-COLOR_ASSESS-":
+                threshold = values['-COLOR_THRESHOLD-']
+                is_all = values['-ALL-']
+
+                if is_all:
+                    invalid_images, _ = cleaner.assess_color_bias_all(threshold)
+                    psg.popup_ok(f'Found {len(invalid_images)} invalid images')
+                else:
+                    try:
+                        filename = values['-FILE LIST-'][0]
+                    except IndexError:
+                        psg.popup_ok('Please select an image first')
+                        continue
+                    score = cleaner.assess_color_bias_single(filename)
                 pass
 
             case "-TEMPLATE_MATCH-":
@@ -77,5 +101,3 @@ if __name__ == '__main__':
                 pass
 
     window.close()
-
-

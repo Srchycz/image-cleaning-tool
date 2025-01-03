@@ -1,5 +1,6 @@
 from src.utils import read_images
 from src.data_cleaning.image_quality import ImageQualityAssessment, TenengradAssessment, LaplacianAssessment
+from src.data_cleaning.anomaly_detection import detect_anomaly_values, detect_color_biases, detect_color_bias, detect_anomaly_value
 
 """ 集成图像清理操作 """
 class Cleaner:
@@ -27,3 +28,14 @@ class Cleaner:
 
         return tmp_ass.assess_image_quality(self.images[filename])
 
+    def assess_brightness_all(self, threshold, invalidate_dark=True):
+        return detect_anomaly_values(self.images, threshold, invalidate_dark)
+
+    def assess_brightness_single(self, filename):
+        return detect_anomaly_value(self.images[filename])
+
+    def assess_color_bias_all(self, threshold):
+        return detect_color_biases(self.images)
+
+    def assess_color_bias_single(self, filename):
+        return detect_color_bias(self.images[filename])

@@ -13,27 +13,35 @@ def detect_anomaly_value(image):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     delta = np.mean(gray_image) - NORMAL
     avg = np.mean(np.abs(gray_image - 128 - delta))
-    k = abs(delta / avg)
+    k = delta / avg
     return k
     # return np.mean(gray_image)
 
 '''检测图像亮度'''
-def detect_anomaly_values(images):
-    scores = []
-    for image in images:
+def detect_anomaly_values(images:dict, threshold=BRIGHTNESS_THRESHOLD, invalidate_dark=True):
+    """ 评估图像亮度 返回不合法列表和亮度分数 """
+    scores = dict()
+    invalid_images = []
+
+    threshold = -abs(threshold) if invalidate_dark else abs(threshold)
+
+    for (key, image) in images.items():
         score = detect_anomaly_value(image)
+        scores[key] = score
 
-        if score > BRIGHTNESS_THRESHOLD:
-            print("该图亮度异常")
-        print(score)
-        cv2.imshow("Image", image)
-        key = cv2.waitKey()
-        if key == 27:
-            break
-        cv2.destroyAllWindows()
+        if score > threshold:
+            invalid_images.append(key)
 
-        scores.append(score)
-    return [True if score > BRIGHTNESS_THRESHOLD else 0 for score in scores]
+        # if score > BRIGHTNESS_THRESHOLD:
+        #     print("该图亮度异常")
+        # print(score)
+        # cv2.imshow("Image", image)
+        # key = cv2.waitKey()
+        # if key == 27:
+        #     break
+        # cv2.destroyAllWindows()
+
+    return invalid_images, scores
 
 '''检测色偏'''
 def detect_color_bias(image):
@@ -51,22 +59,28 @@ def detect_color_bias(image):
     k = abs(D / M)
     return k
 
-def detect_color_biases(images):
-    scores = []
-    for image in images:
+def detect_color_biases(images:dict):
+    """ 评估图像色偏程度 返回不合法列表和分数 """
+    scores = dict()
+    invalid_images = []
+
+    for (key, image) in images.items():
         score = detect_color_bias(image)
 
         if score > BIAS_THRESHOLD:
-            print("该图存在色偏")
-        print(score)
-        cv2.imshow("Image", image)
-        key = cv2.waitKey()
-        if key == 27:
-            break
-        cv2.destroyAllWindows()
+            invalid_images.append(key)
 
-        scores.append(score)
-    return [1 if score > BIAS_THRESHOLD else 0 for score in scores]
+        # if score > BIAS_THRESHOLD:
+        #     print("该图存在色偏")
+        # print(score)
+        # cv2.imshow("Image", image)
+        # key = cv2.waitKey()
+        # if key == 27:
+        #     break
+        # cv2.destroyAllWindows()
+
+        scores[key] = score
+    return invalid_images, scores
 
 
 def normalize_scores(scores):

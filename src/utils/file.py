@@ -3,19 +3,24 @@ import os
 from PIL import Image
 
 def read_images(image_path):
-    """ 读入路径下的所有图片 默认 png 格式 以 BGR 格式返回 """
+    """
+    读入路径下的所有图片 默认 png 格式 以 BGR 格式读入
+    返回一个字典，key为图片名，value为图片
+    """
     filelist = os.listdir(image_path)
-    image_names_list = []
+    # image_names_list = []
+    # images = []
+    images = {}
 
-    images = []
     for file in filelist:
         if file.endswith('.png'): # or file.endswith('.jpg')
             # clear_image_iccp(os.path.join(image_path, file))
             image = cv2.imread(os.path.join(image_path, file))
-            images.append(image)
-            image_names_list.append(file)
+            # images.append(image)
+            # image_names_list.append(file)
+            images[file] = image
 
-    return images, image_names_list
+    return images
 
 def read_image(image_path):
     """ 读入路径指向的图片 默认 png 格式 以 BGR 格式返回 """

@@ -50,7 +50,7 @@ options_column = [
 ]
 
 image_viewer_column = [
-    [psg.Text("从左边图片列表中选择一张图片:")],
+    # [psg.Text("从左边图片列表中选择一张图片:")],
     [psg.Text(size=(40, 1), key="-TOUT-")],
     [psg.Image(key="-IMAGE-")],
     [psg.Text(size=(40, 1), key="-RESULT-"), psg.Button("上一张", key="-PREV-"), psg.Button("下一张", key="-NEXT-")],

@@ -1,17 +1,16 @@
-
-import data_cleaning
 import utils
 import PySimpleGUI as psg
 import os
 import gui
-from src.data_cleaning import ImageQualityAssessment, TenengradAssessment, LaplacianAssessment
-from src.gui.demo import window
+import data_cleaning
 
 # default_path = "./samples"
 default_path = 'C:/Users/29822/work/lockin/image_cleaning_tool/src/samples'
 
 if __name__ == '__main__':
+    cleaner = data_cleaning.Cleaner()
     window = psg.Window('图像清洗工具', gui.layout, enable_close_attempted_event=True)
+
     while True:
         event, values = window.read()
 
@@ -26,28 +25,53 @@ if __name__ == '__main__':
                     folder = default_path
                     window['-FOLDER-'].update(folder)
                 if not os.path.exists(folder):
-                    psg.popup_error(f'Folder {folder} does not exist')
+                    psg.popup_ok(f'Folder {folder} does not exist')
                 else:
                     # utils.images_jpg2png(folder)
-                    images, fname = utils.read_images(folder)
-                    if len(images) == 0:
-                        psg.popup_error(f'No images found in folder {folder}')
+                    cleaner.set_folder_path(folder)
+
+                    if len(cleaner.images) == 0:
+                        psg.popup_ok(f'No images found in folder {folder}')
                     else:
-                        psg.popup_ok(f'Found {len(images)} images in folder {folder}')
-                        window['-FILE LIST-'].update(values=fname)
+                        psg.popup_ok(f'Found {len(cleaner.images)} images in folder {folder}')
+                        window['-FILE LIST-'].update(values=cleaner.images.keys())
 
             case '-FILE LIST-':
                 window['-TOUT-'].update(values['-FILE LIST-'][0])
-                filename = os.path.join(values['-FOLDER-'], values['-FILE LIST-'][0])
+                window['-RESULT-'].update('')
+                filename = os.path.join(cleaner.folder_path, values['-FILE LIST-'][0])
                 # print(filename)
                 # show_image(filename)
                 window['-IMAGE-'].update(source=filename)
 
-            case "SHARPNESS_ASSESS":
-                method = TenengradAssessment() if values['-TENENGRAD-'] else LaplacianAssessment()
-                assessment = ImageQualityAssessment(method)
-
+            case "-SHARPNESS_ASSESS-":
+                method = 0 if values['-TENENGRAD-'] else 1
+                threshold = values['-SHARPNESS_THRESHOLD-']
                 is_all = values['-ALL-']
+
+                if is_all:
+                    invalid_images, _ = cleaner.assess_sharpness_all(method, threshold)
+                    psg.popup_ok(f'Found {len(invalid_images)} invalid images')
+                else:
+                    try:
+                        filename = values['-FILE LIST-'][0]
+                    except IndexError:
+                        psg.popup_ok('Please select an image first')
+                        continue
+                    score = cleaner.assess_sharpness_single(filename, method, threshold)
+                    window['-RESULT-'].update(f"Sharpness Score: %.4f (分数越大越清晰)" % score)
+
+            case "-BRIGHTNESS_ASSESS-":
+                pass
+
+            case "-COLOR_ASSESS-":
+                pass
+
+            case "-TEMPLATE_MATCH-":
+                pass
+
+            case "-SIMILARITY_DETECT-":
+                pass
 
             case _:
                 pass

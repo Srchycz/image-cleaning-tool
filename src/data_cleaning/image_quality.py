@@ -6,7 +6,7 @@ import numpy as np
 '''
 
 class AssessmentStrategy:
-    def __init__(self, threshold):
+    def __init__(self, threshold:float):
         self.threshold = threshold
 
     def assess_image_quality(self, image) -> float:
@@ -39,23 +39,28 @@ class ImageQualityAssessment:
     def __init__(self, method : AssessmentStrategy = TenengradAssessment()):
         self.method = method
 
-    def assess_images_quality(self, images):
+    def assess_images_quality(self, images : dict):
         """ 评估图像清晰度 返回一个标记列表，1表示清晰，0表示模糊 """
-        scores = []
+        scores = {}
+        invalid_images = []
+
+        print(type(images))
         # Assess image quality
-        for image in images:
+        # todo: 显示进度条
+        for (key, image) in images.items():
             score = self.assess_image_quality(image)
+            scores[key] = score
+            if score < float(self.method.threshold):
+                invalid_images.append(key)
 
-            print(score)
-            cv2.imshow("Image", image)
-            key = cv2.waitKey()
-            if key == 27:
-                break
-            cv2.destroyAllWindows()
+            # print(score)
+            # cv2.imshow("Image", image)
+            # key = cv2.waitKey()
+            # if key == 27:
+            #     break
+            # cv2.destroyAllWindows()
 
-            scores.append(score)
-
-        return [True if score > self.method.threshold else 0 for score in scores]
+        return invalid_images, scores
 
     def assess_image_quality(self, image):
         return self.method.assess_image_quality(image)

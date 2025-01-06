@@ -56,3 +56,7 @@ def show_image(image_path):
     cv2.imshow("Image", image)
     cv2.waitKey()
     cv2.destroyAllWindows()
+
+def cv2_to_bytes(image):
+    """ 将 cv2 图片转换为 bytes """
+    return cv2.imencode('.png', image)[1].tobytes()

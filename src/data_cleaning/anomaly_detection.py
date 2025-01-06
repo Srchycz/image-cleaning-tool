@@ -59,7 +59,7 @@ def detect_color_bias(image):
     k = abs(D / M)
     return k
 
-def detect_color_biases(images:dict):
+def detect_color_biases(images:dict, threshold=BIAS_THRESHOLD):
     """ 评估图像色偏程度 返回不合法列表和分数 """
     scores = dict()
     invalid_images = []
@@ -67,7 +67,7 @@ def detect_color_biases(images:dict):
     for (key, image) in images.items():
         score = detect_color_bias(image)
 
-        if score > BIAS_THRESHOLD:
+        if score > threshold:
             invalid_images.append(key)
 
         # if score > BIAS_THRESHOLD:

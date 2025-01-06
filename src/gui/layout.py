@@ -2,10 +2,16 @@ import PySimpleGUI as psg
 
 list_column = [
     [psg.Text('Image Folder:'),
-     psg.InputText(key='-FOLDER-', size=(25, 1)),
+     psg.InputText(key='-FOLDER-', size=(20, 1)),
      psg.FolderBrowse(), psg.OK(key='Folder Path')],
 
     [psg.Listbox(values=[], enable_events=True, size=(40, 20), key="-FILE LIST-")],
+]
+
+marked_column = [
+    [psg.Text('筛选结果:')],
+    [psg.Listbox(values=[], enable_events=True, size=(30, 20), key="-MARKED FILE LIST-")],
+    [psg.Button("单张删除", key="-SINGLE DELETE-"), psg.Button("全部删除", key="-ALL DELETE-")],
 ]
 
 options_column = [
@@ -53,12 +59,14 @@ image_viewer_column = [
     # [psg.Text("从左边图片列表中选择一张图片:")],
     [psg.Text(size=(40, 1), key="-TOUT-")],
     [psg.Image(key="-IMAGE-")],
-    [psg.Text(size=(40, 1), key="-RESULT-"), psg.Button("上一张", key="-PREV-"), psg.Button("下一张", key="-NEXT-")],
+    [psg.Text(size=(40, 1), key="-RESULT-"), psg.Button("删除", key="-DELETE-")],
 ]
 
 layout = [
     [
         psg.Column(list_column),
+        psg.VSeparator(),
+        psg.Column(marked_column),
         psg.VSeparator(),
         psg.Column(options_column),
         psg.VSeparator(),

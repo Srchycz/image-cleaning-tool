@@ -11,7 +11,7 @@ FLANN_INDEX_LSH = 6 # ORB 用这个
 MIN_MATCH_COUNT = 10 # 控制匹配点的数量
 
 
-def detect_similarity_images(images, query_image):
+def detect_similarity_images_with_sift(images, query_image):
     for image in images:
         if (detect_similarity_with_sift(query_image, image)):
             break

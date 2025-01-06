@@ -6,25 +6,27 @@ from src.data_cleaning.anomaly_detection import detect_anomaly_values, detect_co
 from src.data_cleaning.template_matching import template_matching, single_image_template_matching, draw_loc
 from src.data_cleaning.similarity_detection import *
 
-
-
 """ 集成图像清理操作 """
 class Cleaner:
     def __init__(self):
         self.folder_path = None
         self.images = dict()
 
+        self.marked = []
+        self.details = dict()
+
     def set_folder_path(self, folder_path) -> None:
         self.folder_path = folder_path
         self.images = read_images(folder_path)
 
-    def assess_sharpness_all(self, method=0, threshold=1000) -> dict:
+    def assess_sharpness_all(self, method=0, threshold=1000) -> (list, dict):
         if method == 0:
             tmp_ass = ImageQualityAssessment(TenengradAssessment(threshold))
         else:
             tmp_ass = ImageQualityAssessment(LaplacianAssessment(threshold))
 
-        return tmp_ass.assess_images_quality(self.images)
+        self.marked, self.details = tmp_ass.assess_images_quality(self.images)
+        return self.marked, self.details
 
     def assess_sharpness_single(self, filename, method=0, threshold=1000) -> float:
         if method == 0:
@@ -34,19 +36,19 @@ class Cleaner:
 
         return tmp_ass.assess_image_quality(self.images[filename])
 
-    def assess_brightness_all(self, threshold, invalidate_dark=True):
+    def assess_brightness_all(self, threshold, invalidate_dark=True) -> (list, dict):
         return detect_anomaly_values(self.images, threshold, invalidate_dark)
 
     def assess_brightness_single(self, filename):
         return detect_anomaly_value(self.images[filename])
 
-    def assess_color_bias_all(self, threshold):
-        return detect_color_biases(self.images)
+    def assess_color_bias_all(self, threshold) -> (list, dict):
+        return detect_color_biases(self.images, threshold)
 
     def assess_color_bias_single(self, filename):
         return detect_color_bias(self.images[filename])
 
-    def template_match_all(self, template):
+    def template_match_all(self, template) -> (list, dict):
         return template_matching(self.images, template)
 
     def template_match_single(self, filename, template):
@@ -55,7 +57,7 @@ class Cleaner:
     def draw_loc(self, filename, loc, shape):
         return draw_loc(self.images[filename], loc, shape)
 
-    def detect_similarity_all(self, similarity, method=0):
+    def detect_similarity_all(self, similarity, method=0) -> (list, dict):
         pass
 
     def detect_similarity_single(self, filename, similarity, method=0):
@@ -70,4 +72,15 @@ class Cleaner:
     def delete(self, filename):
         self.images.pop(filename)
         # os.remove(os.path.join(self.folder_path, filename))
+        return
+
+    def delete_mark_single(self, filename):
+        self.images.pop(filename)
+        self.marked.pop(filename)
+        # os.remove(os.path.join(self.folder_path, filename))
+        return
+
+    def delete_mark_all(self):
+        self.images.pop(x for x in self.marked)
+        self.marked.clear()
         return

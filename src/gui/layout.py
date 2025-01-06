@@ -59,7 +59,7 @@ image_viewer_column = [
     # [psg.Text("从左边图片列表中选择一张图片:")],
     [psg.Text(size=(40, 1), key="-TOUT-")],
     [psg.Image(key="-IMAGE-")],
-    [psg.Text(size=(40, 1), key="-RESULT-"), psg.Button("删除", key="-DELETE-")],
+    [psg.Text(size=(40, 1), key="-RESULT-"), psg.Button("删除", key="-DELETE-", button_color="red")],
 ]
 
 layout = [

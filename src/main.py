@@ -7,6 +7,13 @@ import data_cleaning
 # default_path = "./samples"
 default_path = 'C:/Users/29822/work/lockin/image_cleaning_tool/src/samples'
 
+def refresh(w):
+    w['-FILE LIST-'].update(values=cleaner.images.keys())
+    w['-MARKED FILE LIST-'].update(values=cleaner.marked.keys())
+    w['-IMAGE-'].update(data=b'')
+    w['-RESULT-'].update('')
+    w['-TOUT-'].update('')
+
 if __name__ == '__main__':
     cleaner = data_cleaning.Cleaner()
     window = psg.Window('图像清洗工具', gui.layout, enable_close_attempted_event=True)
@@ -38,11 +45,18 @@ if __name__ == '__main__':
 
             case '-FILE LIST-':
                 window['-TOUT-'].update(values['-FILE LIST-'][0])
-                window['-RESULT-'].update('')
+                window['-RESULT-'].update('') # todo: 展示对应细节？
                 filename = values['-FILE LIST-'][0]
                 # filename = os.path.join(cleaner.folder_path, values['-FILE LIST-'][0])
                 # window['-IMAGE-'].update(source=filename)
                 window['-IMAGE-'].update(data=cleaner.show_in_norm_bytes(filename))
+
+            case '-MARKED FILE LIST-':
+                window['-TOUT-'].update(values['-MARKED FILE LIST-'][0])
+                window['-RESULT-'].update('')
+                filename = values['-MARKED FILE LIST-'][0]
+                window['-IMAGE-'].update(data=cleaner.show_in_norm_bytes(filename))
+                window['-FILE LIST-'].update(set_to_index=[])
 
             case "-SHARPNESS_ASSESS-":
                 method = 0 if values['-TENENGRAD-'] else 1
@@ -52,6 +66,7 @@ if __name__ == '__main__':
                 if is_all:
                     invalid_images, _ = cleaner.assess_sharpness_all(method, threshold)
                     psg.popup_ok(f'Found {len(invalid_images)} invalid images')
+                    window['-MARKED FILE LIST-'].update(values=invalid_images)
                 else:
                     try:
                         filename = values['-FILE LIST-'][0]
@@ -68,6 +83,7 @@ if __name__ == '__main__':
                 if is_all:
                     invalid_images, _ = cleaner.assess_brightness_all(threshold)
                     psg.popup_ok(f'Found {len(invalid_images)} invalid images')
+                    window['-MARKED FILE LIST-'].update(values=invalid_images)
                 else:
                     try:
                         filename = values['-FILE LIST-'][0]
@@ -84,6 +100,7 @@ if __name__ == '__main__':
                 if is_all:
                     invalid_images, _ = cleaner.assess_color_bias_all(threshold)
                     psg.popup_ok(f'Found {len(invalid_images)} invalid images')
+                    window['-MARKED FILE LIST-'].update(values=invalid_images)
                 else:
                     try:
                         filename = values['-FILE LIST-'][0]
@@ -105,6 +122,7 @@ if __name__ == '__main__':
                 if is_all:
                     valid_images, mark = cleaner.template_match_all(template)
                     psg.popup_ok(f'Found {len(valid_images)} valid images')
+                    window['-MARKED FILE LIST-'].update(values=valid_images)
                 else:
                     try:
                         filename = values['-FILE LIST-'][0]
@@ -139,7 +157,7 @@ if __name__ == '__main__':
                         psg.popup_ok('Please select an image first')
                         continue
                     cleaner.detect_similarity_single(filename, similarity, method)
-                    pass
+                    pass # todo: implement this branch
 
             case '-DELETE-':
                 try:
@@ -156,6 +174,27 @@ if __name__ == '__main__':
                     window['-IMAGE-'].update(data=b'')
                     window['-RESULT-'].update('')
                     window['-TOUT-'].update('')
+
+            case '-SINGLE DELETE-':
+                try:
+                    filename = values['-MARKED FILE LIST-'][0]
+                except IndexError:
+                    psg.popup_ok('Please select an image first')
+                    continue
+
+                ch = psg.popup_ok_cancel(f'Delete {filename}?')
+                if ch == 'OK':
+                    cleaner.delete_mark_single(filename)
+
+                    refresh(window)
+
+            case '-ALL DELETE-':
+                ch = psg.popup_ok_cancel('Delete all images?')
+
+                if ch == 'OK':
+                    cleaner.delete_mark_all()
+
+                    refresh(window)
 
             case _:
                 pass

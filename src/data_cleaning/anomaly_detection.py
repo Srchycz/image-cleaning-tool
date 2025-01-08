@@ -23,7 +23,7 @@ def detect_anomaly_values(images:dict, threshold=BRIGHTNESS_THRESHOLD, invalidat
     scores = dict()
     invalid_images = []
 
-    threshold = -abs(threshold) if invalidate_dark else abs(threshold)
+    threshold = -abs(float(threshold)) if invalidate_dark else abs(float(threshold))
 
     for (key, image) in images.items():
         score = detect_anomaly_value(image)

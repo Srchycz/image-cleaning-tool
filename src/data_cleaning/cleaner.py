@@ -12,6 +12,7 @@ class Cleaner:
         self.folder_path = None
         self.images = dict()
 
+        self.flag = 0
         self.marked = []
         self.details = dict()
 
@@ -25,6 +26,7 @@ class Cleaner:
         else:
             tmp_ass = ImageQualityAssessment(LaplacianAssessment(threshold))
 
+        self.flag = 1
         self.marked, self.details = tmp_ass.assess_images_quality(self.images)
         return self.marked, self.details
 
@@ -37,19 +39,25 @@ class Cleaner:
         return tmp_ass.assess_image_quality(self.images[filename])
 
     def assess_brightness_all(self, threshold, invalidate_dark=True) -> (list, dict):
-        return detect_anomaly_values(self.images, threshold, invalidate_dark)
+        self.flag = 1
+        self.marked, self.details = detect_anomaly_values(self.images, threshold, invalidate_dark)
+        return self.marked, self.details
 
     def assess_brightness_single(self, filename):
         return detect_anomaly_value(self.images[filename])
 
     def assess_color_bias_all(self, threshold) -> (list, dict):
-        return detect_color_biases(self.images, threshold)
+        self.flag = 1
+        self.marked, self.details = detect_color_biases(self.images, threshold)
+        return self.marked, self.details
 
     def assess_color_bias_single(self, filename):
         return detect_color_bias(self.images[filename])
 
     def template_match_all(self, template) -> (list, dict):
-        return template_matching(self.images, template)
+        self.flag = 2
+        self.marked, self.details = template_matching(self.images, template)
+        return self.marked, self.details
 
     def template_match_single(self, filename, template):
         return single_image_template_matching(self.images[filename], template)
@@ -58,7 +66,7 @@ class Cleaner:
         return draw_loc(self.images[filename], loc, shape)
 
     def detect_similarity_all(self, similarity, method=0) -> (list, dict):
-        pass
+        pass # TODO: implement this
 
     def detect_similarity_single(self, filename, similarity, method=0):
         if method == 0:
@@ -71,12 +79,16 @@ class Cleaner:
 
     def delete(self, filename):
         self.images.pop(filename)
+        try:
+            self.marked.remove(filename)
+        except ValueError:
+            pass
         # os.remove(os.path.join(self.folder_path, filename))
         return
 
     def delete_mark_single(self, filename):
         self.images.pop(filename)
-        self.marked.pop(filename)
+        self.marked.remove(filename)
         # os.remove(os.path.join(self.folder_path, filename))
         return
 

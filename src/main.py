@@ -45,16 +45,19 @@ if __name__ == '__main__':
 
             case '-FILE LIST-':
                 window['-TOUT-'].update(values['-FILE LIST-'][0])
-                window['-RESULT-'].update('') # todo: 展示对应细节？
+                window['-RESULT-'].update('')
                 filename = values['-FILE LIST-'][0]
                 # filename = os.path.join(cleaner.folder_path, values['-FILE LIST-'][0])
                 # window['-IMAGE-'].update(source=filename)
                 window['-IMAGE-'].update(data=cleaner.show_in_norm_bytes(filename))
 
             case '-MARKED FILE LIST-':
-                window['-TOUT-'].update(values['-MARKED FILE LIST-'][0])
-                window['-RESULT-'].update('')
                 filename = values['-MARKED FILE LIST-'][0]
+                window['-TOUT-'].update(filename)
+                if cleaner.flag == 1:
+                    window['-RESULT-'].update(f'Result: {cleaner.details[filename]}')
+                else:
+                    window['-RESULT-'].update('')
                 window['-IMAGE-'].update(data=cleaner.show_in_norm_bytes(filename))
                 window['-FILE LIST-'].update(set_to_index=[])
 
@@ -91,7 +94,7 @@ if __name__ == '__main__':
                         psg.popup_ok('Please select an image first')
                         continue
                     score = cleaner.assess_brightness_single(filename)
-                    window['-RESULT-'].update(f"Brightness Score: %.4f (分数越大越亮)" % score)
+                    window['-RESULT-'].update(f"Color Bias Score: %.4f (分数越大越亮)" % score)
 
             case "-COLOR_ASSESS-":
                 threshold = values['-COLOR_THRESHOLD-']

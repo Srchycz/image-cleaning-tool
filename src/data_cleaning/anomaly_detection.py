@@ -29,7 +29,9 @@ def detect_anomaly_values(images:dict, threshold=BRIGHTNESS_THRESHOLD, invalidat
         score = detect_anomaly_value(image)
         scores[key] = score
 
-        if score > threshold:
+        if invalidate_dark == True and score < threshold:
+            invalid_images.append(key)
+        elif invalidate_dark == False and score > threshold:
             invalid_images.append(key)
 
         # if score > BRIGHTNESS_THRESHOLD:
@@ -59,10 +61,12 @@ def detect_color_bias(image):
     k = abs(D / M)
     return k
 
-def detect_color_biases(images:dict, threshold=BIAS_THRESHOLD):
+def detect_color_biases(images:dict, threshold:float=BIAS_THRESHOLD):
     """ 评估图像色偏程度 返回不合法列表和分数 """
     scores = dict()
     invalid_images = []
+
+    threshold = float(threshold)
 
     for (key, image) in images.items():
         score = detect_color_bias(image)

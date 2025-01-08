@@ -94,7 +94,7 @@ if __name__ == '__main__':
                         psg.popup_ok('Please select an image first')
                         continue
                     score = cleaner.assess_brightness_single(filename)
-                    window['-RESULT-'].update(f"Color Bias Score: %.4f (分数越大越亮)" % score)
+                    window['-RESULT-'].update(f"Brightness Score: %.4f (分数越大越亮)" % score)
 
             case "-COLOR_ASSESS-":
                 threshold = values['-COLOR_THRESHOLD-']
@@ -111,7 +111,7 @@ if __name__ == '__main__':
                         psg.popup_ok('Please select an image first')
                         continue
                     score = cleaner.assess_color_bias_single(filename)
-                    window['-RESULT-'].update(f"Brightness Score: %.4f (分数越大色偏越严重)" % score)
+                    window['-RESULT-'].update(f"Color Bias Score: %.4f (分数越大色偏越严重)" % score)
 
             case "-TEMPLATE_MATCH-":
                 template_path = values['-TEMPLATE-']
